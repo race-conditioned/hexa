@@ -6,15 +6,19 @@ import (
 	"net/http"
 )
 
+type JSONWriter interface {
+	Encode(w http.ResponseWriter, status int, v any)
+}
+
 type Writer struct{}
 
 func NewWriter() *Writer {
 	return &Writer{}
 }
 
-// JSON writes a JSON response with the given status code.
+// Encode writes a JSON response with the given status code.
 // If encoding fails, it logs and falls back to an internal error payload.
-func (writer *Writer) JSON(w http.ResponseWriter, status int, v any) {
+func (writer *Writer) Encode(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 
 	buf, err := json.Marshal(v)
@@ -35,7 +39,7 @@ func (writer *Writer) JSON(w http.ResponseWriter, status int, v any) {
 
 // Error writes a JSON error response with the given status code and message.
 func (writer *Writer) Error(w http.ResponseWriter, status int, msg string) {
-	writer.JSON(w, status, map[string]string{"error": msg})
+	writer.Encode(w, status, map[string]string{"error": msg})
 }
 
 // Wrap wraps an http.ResponseWriter to capture status code and bytes written.

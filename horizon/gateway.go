@@ -8,6 +8,10 @@ import (
 
 type HandlerKey string
 
+func (k HandlerKey) String() string {
+	return string(k)
+}
+
 // Option configures a Gateway.
 type Option[ctx inbound.Ctx] func(*Gateway[ctx])
 
@@ -41,4 +45,14 @@ func (g *Gateway[ctx]) Handler(name HandlerKey) (inbound.UnaryHandler[ctx, inbou
 	defer g.mu.RUnlock()
 	h, ok := g.handlers[name]
 	return h, ok
+}
+
+func (g *Gateway[ctx]) Handlers() map[HandlerKey]inbound.UnaryHandler[ctx, inbound.Command, inbound.Result] {
+	handlerMap := make(map[HandlerKey]inbound.UnaryHandler[ctx, inbound.Command, inbound.Result])
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	for k, v := range g.handlers {
+		handlerMap[k] = v
+	}
+	return handlerMap
 }

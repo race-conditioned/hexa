@@ -1,6 +1,24 @@
 package main
 
-import "hexa/m/v2/horizon/ports/inbound"
+import (
+	"hexa/m/v2/horizon/ports/inbound"
+)
+
+type TransferCommandHTTP struct {
+	FromAccount    string `json:"from_account"`
+	ToAccount      string `json:"to_account"`
+	AmountCents    int64  `json:"amount_cents"`
+	IdempotencyKey string `json:"idempotency_key"`
+}
+
+func (dto *TransferCommandHTTP) ToCommand() inbound.Command {
+	return TransferCommand{
+		fromAccount:    dto.FromAccount,
+		toAccount:      dto.ToAccount,
+		amountCents:    dto.AmountCents,
+		idempotencyKey: dto.IdempotencyKey,
+	}
+}
 
 // TransferCommand defines the external API payload for /transfer from any transport.
 type TransferCommand struct {
@@ -31,9 +49,25 @@ func (t TransferCommand) IdempotencyKey() string {
 }
 
 type TransferResult struct {
-	status  inbound.ResultStatus
-	message string
+	transactionID string
+	status        inbound.ResultStatus
+	message       string
 }
 
+func (r TransferResult) TransactionID() string        { return r.transactionID }
 func (r TransferResult) Message() string              { return r.message }
 func (r TransferResult) Status() inbound.ResultStatus { return r.status }
+
+func (r TransferResult) Encode(s inbound.Sink) {
+	s.Write(r.status.String(), TransferResponse{
+		TransactionID: r.transactionID,
+		Status:        r.status.String(),
+		Message:       r.message,
+	})
+}
+
+type TransferResponse struct {
+	TransactionID string `json:"transaction_id"`
+	Status        string `json:"status"`
+	Message       string `json:"message"`
+}

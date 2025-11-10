@@ -1,8 +1,9 @@
 package symphony
 
 import (
-	"hexa/m/v2/horizon/ports/inbound"
 	"sync"
+
+	"hexa/m/v2/horizon/ports/inbound"
 )
 
 // SymphonyOption customizes the Symphony composer (pre/post only, universal).
@@ -113,7 +114,6 @@ func (c *Composition[ctx, com, res]) Wrap(base inbound.UnaryHandler[ctx, com, re
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	h := base
-
 
 	// 1) Post
 	if c.postOrder != nil {

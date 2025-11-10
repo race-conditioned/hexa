@@ -20,7 +20,7 @@ type immediateDispatcher struct{}
 // Submit: immediately return success
 func (d *immediateDispatcher) Submit(_ context.Context, _ TransferCommand) TransferResult {
 	fmt.Println("submitting dispatch")
-	return TransferResult{"success", "ok"}
+	return TransferResult{"1", "success", "ok"}
 }
 func (d *immediateDispatcher) QueueDepth() int64    { return 0 }
 func (d *immediateDispatcher) ActiveWorkers() int64 { return 0 }

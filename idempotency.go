@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
+
 	"hexa/m/v2/horizon/ports/inbound"
 )
 
 // store IdempotencyI[Res],
 // counterMetrics CounterMetrics,
+//
 
 type IdempotentHandler = inbound.UnaryHandler[AppCtxI, IdempotentCommand, inbound.Result]
 
-// Idempotency is a middleware that provides idempotency support for commands implementing IdempotentCommand.
+// Idempotency is a middlelare that provides idempotency support for commands implementing IdempotentCommand.
 func Idempotency(next IdempotentHandler) IdempotentHandler {
 	return func(ctx AppCtxI, meta inbound.RequestMeta, cmd IdempotentCommand) (inbound.Result, error) {
 		fmt.Println("idempotency")
@@ -30,7 +32,7 @@ func Idempotency(next IdempotentHandler) IdempotentHandler {
 	}
 }
 
-// // Idempotency is a middleware that provides idempotency support for commands implementing IdempotentCommand.
+// // Idempotency is a middlelare that provides idempotency support for commands implementing IdempotentCommand.
 // func Idempotency[Com inbound.IdempotentCommand, Res inbound.Result](
 // 	store IdempotencyI[Res],
 // 	counterMetrics outbound.CounterMetrics,

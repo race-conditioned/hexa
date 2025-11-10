@@ -1,31 +1,47 @@
 package dt
 
-// // RequestLogger logs each HTTP request with method, path, status, bytes, latency, and client info.
-// func RequestLogger(logger platform.Logger) func(http.Handler) http.Handler {
-// 	return func(next http.Handler) http.Handler {
-// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			start := time.Now()
-//
-// 			writer := nolan.NewWriter()
-// 			sw := writer.Wrap(w)
-//
-// 			next.ServeHTTP(sw, r)
-//
-// 			latency := time.Since(start)
-// 			status, bytes, _ := writer.Status(sw)
-// 			rid, _ := FromContext(r.Context())
-//
-// 			logger.Info("http request",
-// 				platform.Field{Key: "method", Value: r.Method},
-// 				platform.Field{Key: "path", Value: r.URL.Path},
-// 				platform.Field{Key: "status", Value: status},
-// 				platform.Field{Key: "bytes", Value: bytes},
-// 				platform.Field{Key: "latency_ms", Value: latency.Milliseconds()},
-// 				platform.Field{Key: "client_id", Value: r.Header.Get("X-Client-ID")},
-// 				platform.Field{Key: "remote_addr", Value: r.RemoteAddr},
-// 				platform.Field{Key: "user_agent", Value: r.UserAgent()},
-// 				platform.Field{Key: "request_id", Value: rid},
-// 			)
-// 		})
-// 	}
-// }
+import (
+	"net/http"
+	"time"
+
+	"hexa/m/v2/fusion/dt/nolan"
+	"hexa/m/v2/fusion/intake"
+)
+
+// requestLogger builds an HTTP middleware that logs request lifecycle info
+// using the transport-neutral intake.LogHook from the ingress Spec.
+func requestLogger(next http.Handler, hookFn intake.LogHook) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		// Wrap the ResponseWriter to capture status and bytes written.
+		writer := nolan.NewWriter()
+		sw := writer.Wrap(w)
+
+		next.ServeHTTP(sw, r)
+
+		// Collect neutral metadata for the hook.
+		latency := time.Since(start)
+		status, bytesWritten, _ := writer.Status(sw)
+		rid, _ := FromContext(r.Context())
+
+		if hookFn != nil {
+			hookFn(
+				intake.Event{
+					Protocol: "http",
+					Target:   r.URL.Path,
+					ClientID: extractClientID(r),
+				},
+				intake.LogFields{
+					StatusCode: status,
+					Bytes:      int64(bytesWritten),
+					LatencyMs:  latency.Milliseconds(),
+					Method:     r.Method,
+					RequestID:  rid,
+					RemoteAddr: r.RemoteAddr,
+					UserAgent:  r.UserAgent(),
+				},
+			)
+		}
+	})
+}

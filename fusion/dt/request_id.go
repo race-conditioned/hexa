@@ -5,16 +5,18 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
+
+	"hexa/m/v2/fusion/intake"
 )
 
 type ctxKey int
 
 const requestIDKey ctxKey = iota
 
-// RequestID is a middleware that ensures each request has a unique request ID.
+// requestID is a middleware that ensures each request has a unique request ID.
 // If the incoming request has an "X-Request-ID" header, it uses that value.
 // Otherwise, it generates a new random ID.
-func RequestID(next http.Handler) http.Handler {
+func requestID(next http.Handler, hookFn intake.RequestIDHook) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := r.Header.Get("X-Request-ID")
 		if id == "" {
@@ -24,6 +26,14 @@ func RequestID(next http.Handler) http.Handler {
 		}
 		ctx := context.WithValue(r.Context(), requestIDKey, id)
 		w.Header().Set("X-Request-ID", id)
+		if hookFn != nil {
+			hookFn(intake.Event{
+				Protocol: "http",
+				Target:   r.URL.Path,
+				ClientID: extractClientID(r),
+			}, id)
+		}
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

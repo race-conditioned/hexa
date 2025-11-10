@@ -2,61 +2,53 @@ package dt
 
 import (
 	"context"
-	"net"
 	"net/http"
-	"strings"
 	"time"
+
+	"hexa/m/v2/fusion/intake"
 )
 
-// AllowFunc is a minimal adapter to allow various rate limiting decisions.
-type AllowFunc func(ctx context.Context, key string) bool
+// rateLimit rejects early (429) without reading the body.
+// It is purely transport-level (does not depend on business logic).
+func rateLimit(next http.Handler, hook intake.Hook, allow intake.AllowFunc) http.Handler {
+	// No limiter configured → no-op
+	if allow == nil {
+		return next
+	}
 
-// ClientKeyFromRequest picks API key, then X-Forwarded-For, then RemoteAddr.
-func ClientKeyFromRequest(r *http.Request) string {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Short timeout budget: don’t block the transport thread.
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Millisecond)
+		defer cancel()
+
+		key := clientKeyFromRequest(r)
+
+		if !allow(ctx, key) {
+			_ = r.Body.Close()
+			w.Header().Set("Retry-After", "1")
+			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+
+			if hook != nil {
+				hook(intake.Event{
+					Protocol: "http",
+					Target:   r.URL.Path,
+					ClientID: key,
+				})
+			}
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+// clientKeyFromRequest extracts a usable client identifier.
+func clientKeyFromRequest(r *http.Request) string {
 	if k := r.Header.Get("X-API-Key"); k != "" {
 		return k
 	}
 	if k := r.Header.Get("X-Client-ID"); k != "" {
 		return k
 	}
-	ip := clientIP(r)
-	if ip != "" {
-		return ip
-	}
 	return r.RemoteAddr
-}
-
-// clientIP extracts the client IP from X-Forwarded-For or RemoteAddr.
-func clientIP(r *http.Request) string {
-	xff := r.Header.Get("X-Forwarded-For")
-	if xff != "" {
-		parts := strings.Split(xff, ",")
-		return strings.TrimSpace(parts[0])
-	}
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-	return host
-}
-
-// RateLimitHTTP rejects early (429) without reading the body.
-func RateLimitHTTP(allow AllowFunc) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Very short budget so we never block at this layer.
-			ctx, cancel := context.WithTimeout(r.Context(), 2*time.Millisecond)
-			defer cancel()
-
-			key := ClientKeyFromRequest(r)
-			if !allow(ctx, key) {
-				// close body to free the conn; as it was not read.
-				_ = r.Body.Close()
-				w.Header().Set("Retry-After", "1")
-				http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
-				return
-			}
-			next.ServeHTTP(w, r)
-		})
-	}
 }

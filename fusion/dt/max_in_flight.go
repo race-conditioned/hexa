@@ -1,19 +1,29 @@
 package dt
 
-import "net/http"
+import (
+	"net/http"
 
-// MaxInFlight limits the number of concurrent in-flight HTTP requests to n.
-func MaxInFlight(n int) func(http.Handler) http.Handler {
+	"hexa/m/v2/fusion/intake"
+)
+
+// maxInFlight limits the number of concurrent in-flight HTTP requests to n.
+func maxInFlight(next http.Handler, n int, hookFn intake.Hook) http.Handler {
 	sem := make(chan struct{}, n)
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			select {
-			case sem <- struct{}{}:
-				defer func() { <-sem }()
-				next.ServeHTTP(w, r)
-			default:
-				http.Error(w, "server busy", http.StatusServiceUnavailable)
-			}
-		})
-	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if hookFn != nil {
+			hookFn(intake.Event{
+				Protocol: "http",
+				Target:   r.URL.Path,
+				ClientID: extractClientID(r),
+			})
+		}
+
+		select {
+		case sem <- struct{}{}:
+			defer func() { <-sem }()
+			next.ServeHTTP(w, r)
+		default:
+			http.Error(w, "server busy", http.StatusServiceUnavailable)
+		}
+	})
 }
