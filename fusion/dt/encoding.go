@@ -3,6 +3,7 @@ package dt
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -26,8 +27,11 @@ func Unary[c inbound.Ctx](
 	ctx c,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("trace: Unary")
 		// 1) allocate the right concrete command
 		payload := newPayload()
+
+		fmt.Printf("trace: allocated payload of type %T\n", payload)
 
 		// 2) decode JSON into it
 		dec := json.NewDecoder(r.Body)
@@ -36,6 +40,8 @@ func Unary[c inbound.Ctx](
 			encodeError(w, err)
 			return
 		}
+
+		fmt.Printf("trace: decoded payload: %+v\n", payload)
 
 		// 3) figure out what to pass to the gateway
 		var cmd inbound.Command
@@ -49,9 +55,11 @@ func Unary[c inbound.Ctx](
 			encodeError(w, apperr.Invalid("payload is neither Command nor CommandDTO"))
 			return
 		}
+		fmt.Printf("trace: constructed command of type %T\n", cmd)
 
 		// 4) build meta
 		meta := metaFrom(r)
+		fmt.Printf("trace: constructed meta: %+v\n", meta)
 
 		// 5) call the gateway handler
 		res, err := handler(ctx, meta, cmd)
@@ -60,9 +68,12 @@ func Unary[c inbound.Ctx](
 			return
 		}
 
+		fmt.Printf("trace: obtained result of type %T\n", res)
+
 		// 6) write via sink
 		sink := nolan.NewSink(w)
 		res.Encode(sink)
+		fmt.Println("trace: response encoded successfully")
 	}
 }
 

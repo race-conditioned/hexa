@@ -1,6 +1,7 @@
 package dt
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/race-conditioned/hexa/fusion/intake"
@@ -25,13 +26,13 @@ func NewFusion[c inbound.Ctx](
 	return DTFusion[c]{gw: gw, mux: http.NewServeMux(), spec: spec, ctx: ctx, routes: routes}
 }
 
-// fusion/dt/router.go
 func (dt DTFusion[c]) Build() http.Handler {
 	for _, rt := range dt.routes {
 		h, ok := dt.gw.Handler(rt.HandlerKey)
 		if !ok {
 			continue
 		}
+		fmt.Println("found handler for: ", rt.Path)
 
 		path := rt.Path
 		if path == "" {
