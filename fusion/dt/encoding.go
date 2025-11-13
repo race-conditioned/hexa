@@ -35,7 +35,9 @@ func Unary[c inbound.Ctx](
 
 		// 2) decode JSON into it
 		dec := json.NewDecoder(r.Body)
+		fmt.Printf("trace: created JSON decoder\n")
 		dec.DisallowUnknownFields()
+		fmt.Printf("trace: disallowed unknown fields\n")
 		if err := dec.Decode(payload); err != nil {
 			fmt.Printf("trace: decode error: %v\n", err)
 			encodeError(w, err)
