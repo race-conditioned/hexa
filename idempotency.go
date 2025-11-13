@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"hexa/m/v2/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 // store IdempotencyI[Res],

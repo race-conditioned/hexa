@@ -3,7 +3,7 @@ package dt
 import (
 	"net/http"
 
-	"hexa/m/v2/fusion/intake"
+	"github.com/race-conditioned/hexa/fusion/intake"
 )
 
 // maxInFlight limits the number of concurrent in-flight HTTP requests to n.

@@ -8,12 +8,12 @@ import (
 	"syscall"
 	"time"
 
-	"hexa/m/v2/endurance"
-	"hexa/m/v2/fusion/dt"
-	"hexa/m/v2/fusion/intake"
-	"hexa/m/v2/horizon"
-	"hexa/m/v2/horizon/ports/inbound"
-	"hexa/m/v2/symphony"
+	"github.com/race-conditioned/hexa/endurance"
+	"github.com/race-conditioned/hexa/fusion/dt"
+	"github.com/race-conditioned/hexa/fusion/intake"
+	"github.com/race-conditioned/hexa/horizon"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/symphony"
 )
 
 type AppCtxI interface {

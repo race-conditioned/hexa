@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"hexa/m/v2/fusion/intake"
+	"github.com/race-conditioned/hexa/fusion/intake"
 )
 
 type ctxKey int

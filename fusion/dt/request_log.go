@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"hexa/m/v2/fusion/dt/nolan"
-	"hexa/m/v2/fusion/intake"
+	"github.com/race-conditioned/hexa/fusion/dt/nolan"
+	"github.com/race-conditioned/hexa/fusion/intake"
 )
 
 // requestLogger builds an HTTP middleware that logs request lifecycle info

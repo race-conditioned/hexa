@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"hexa/m/v2/horizon/ports/inbound"
 	"time"
+
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 // ObserveLatency is a middleware that observes the latency of requests and records success metrics.

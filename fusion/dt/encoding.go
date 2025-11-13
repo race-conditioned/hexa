@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"hexa/m/v2/apperr"
-	"hexa/m/v2/fusion/dt/nolan"
-	"hexa/m/v2/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/apperr"
+	"github.com/race-conditioned/hexa/fusion/dt/nolan"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 type (

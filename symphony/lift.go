@@ -1,8 +1,8 @@
 package symphony
 
 import (
-	"hexa/m/v2/apperr"
-	"hexa/m/v2/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/apperr"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 // Lift adapts a universal (type-erased) middleware to a typed one.
@@ -86,4 +86,3 @@ func LiftCap[c inbound.Ctx, Com inbound.Command, Res inbound.Result, Cap inbound
 		}
 	}
 }
-

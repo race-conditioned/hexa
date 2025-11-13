@@ -1,8 +1,8 @@
 package dt
 
 import (
-	"hexa/m/v2/horizon"
-	"hexa/m/v2/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/horizon"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 // Route describes how an HTTP path maps to a gateway handler.

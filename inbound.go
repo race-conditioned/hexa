@@ -1,6 +1,6 @@
 package main
 
-import "hexa/m/v2/horizon/ports/inbound"
+import "github.com/race-conditioned/hexa/horizon/ports/inbound"
 
 // Idempotent is an optional Command Capability
 type Idempotent interface {

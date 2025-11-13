@@ -3,7 +3,7 @@ package symphony
 import (
 	"sync"
 
-	"hexa/m/v2/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 // SymphonyOption customizes the Symphony composer (pre/post only, universal).

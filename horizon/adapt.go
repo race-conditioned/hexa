@@ -1,8 +1,8 @@
 package horizon
 
 import (
-	"hexa/m/v2/apperr"
-	"hexa/m/v2/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/apperr"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 // Adapt turns a strongly-typed endpoint into a gateway-compatible erased handler.

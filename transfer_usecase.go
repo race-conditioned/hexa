@@ -3,7 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"hexa/m/v2/apperr"
+
+	"github.com/race-conditioned/hexa/apperr"
 )
 
 // TransferUsecase handles transfer requests.

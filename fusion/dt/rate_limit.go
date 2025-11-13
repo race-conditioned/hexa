@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"hexa/m/v2/fusion/intake"
+	"github.com/race-conditioned/hexa/fusion/intake"
 )
 
 // rateLimit rejects early (429) without reading the body.

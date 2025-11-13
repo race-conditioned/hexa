@@ -3,9 +3,9 @@ package dt
 import (
 	"net/http"
 
-	"hexa/m/v2/fusion/intake"
-	"hexa/m/v2/horizon"
-	"hexa/m/v2/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/fusion/intake"
+	"github.com/race-conditioned/hexa/horizon"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 type DTFusion[c inbound.Ctx] struct {

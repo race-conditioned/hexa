@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"hexa/m/v2/apperr"
-	"hexa/m/v2/horizon/ports/inbound"
+
+	"github.com/race-conditioned/hexa/apperr"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 // RateLimit is a middleware that enforces rate limiting based on the provided limiter.

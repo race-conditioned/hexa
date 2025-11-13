@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"hexa/m/v2/apperr"
-	"hexa/m/v2/horizon/ports/inbound"
+
+	"github.com/race-conditioned/hexa/apperr"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 // Timeout is a middleware that enforces a timeout on request processing.

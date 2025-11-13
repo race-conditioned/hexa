@@ -3,7 +3,7 @@ package horizon
 import (
 	"sync"
 
-	"hexa/m/v2/horizon/ports/inbound"
+	"github.com/race-conditioned/hexa/horizon/ports/inbound"
 )
 
 type HandlerKey string

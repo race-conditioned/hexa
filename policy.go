@@ -1,8 +1,6 @@
 package main
 
-import (
-	"hexa/m/v2/symphony"
-)
+import "github.com/race-conditioned/hexa/symphony"
 
 // PolicyStage represents different stages where policies can be applied.
 
