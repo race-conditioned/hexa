@@ -1,3 +1,3 @@
-module hexa/m/v2
+module hexa
 
 go 1.25.3
